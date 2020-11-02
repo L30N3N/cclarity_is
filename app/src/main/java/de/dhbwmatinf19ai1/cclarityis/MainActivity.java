@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     String url;
     TextView textView;
     TextView textView2;
+    EditText editText;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         btn = findViewById(R.id.button);
         textView = findViewById(R.id.textView);
         textView2 = findViewById(R.id.textView2);
+        editText = findViewById(R.id.editTextTextPersonName);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 getJsonFromWeb(url);
@@ -44,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getJsonFromWeb(String url) {
+
+        String landkreis_ausw = editText.getText().toString();
+
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            calculateCases(myResponse);
+                            calculateCases(myResponse, landkreis_ausw);
                         }
                     });
                 }
@@ -72,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void calculateCases(String json) {
+    public void calculateCases(String json, String landkreis_ausw) {
 
         int anzfall = 0;
         String landkreis = null;
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 String test = c.getString("attributes");
                 JSONObject reader1 = new JSONObject(test);
                 landkreis = reader1.getString("GEN");
-                if (landkreis.equals("Ostholstein")) {
+                if (landkreis.equals(landkreis_ausw)) {
                     BL = reader1.getString("BL");
                     anzfall = reader1.getInt("cases");
                     inzidenz = reader1.getInt("cases7_per_100k");
@@ -101,13 +109,12 @@ public class MainActivity extends AppCompatActivity {
                     inzidenz_bl = reader1.getInt("cases7_bl_per_100k");
                     todesrate = reader1.getInt("death_rate");
                     tode = reader1.getInt("deaths");
+                    textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall + "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl + "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + todesrate + "\n\n" + "Stand: " + last_update);
                     break;
+                }else{
+                    textView2.setText("Unbekannter Landkreis!");
                 }
-
             }
-
-            textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall + "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl + "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + todesrate + "\n\n" + "Stand: " + last_update);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
