@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     TextView textView2;
     EditText editText;
+    ImageView imageView;
 
 
 
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
         textView2 = findViewById(R.id.textView2);
         editText = findViewById(R.id.editTextTextPersonName);
+        imageView = findViewById(R.id.imageView);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 getJsonFromWeb(url);
@@ -82,14 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void calculateCases(String json, String landkreis_ausw) {
 
-        int anzfall = 0;
-        String landkreis = null;
+        int anzfall;
+        String landkreis;
         int inzidenz = 0;
-        String last_update = null;
-        int todesrate = 0;
-        int tode = 0;
-        int inzidenz_bl = 0;
-        String BL = null;
+        String last_update;
+        int todesrate;
+        int tode;
+        int inzidenz_bl;
+        String BL;
 
 
         try {
@@ -109,10 +112,20 @@ public class MainActivity extends AppCompatActivity {
                     inzidenz_bl = reader1.getInt("cases7_bl_per_100k");
                     todesrate = reader1.getInt("death_rate");
                     tode = reader1.getInt("deaths");
-                    textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall + "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl + "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + todesrate + "\n\n" + "Stand: " + last_update);
+                    textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall +
+                                      "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
+                                      "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + todesrate + "\n\n" + "Stand: " + last_update);
+                    if (inzidenz < 35) {
+                        imageView.setImageResource(R.drawable.ampel_gruen);
+                    }else if (inzidenz >= 50) {
+                        imageView.setImageResource(R.drawable.ampel_rot);
+                    }else if (inzidenz >= 35 && inzidenz < 50) {
+                        imageView.setImageResource(R.drawable.ampel_gelb);
+                    }
                     break;
                 }else{
                     textView2.setText("Unbekannter Landkreis!");
+                    imageView.setImageResource(R.drawable.ampel_leer);
                 }
             }
         } catch (JSONException e) {

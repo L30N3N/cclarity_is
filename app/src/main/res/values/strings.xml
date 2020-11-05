@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">cclarity is</string>
     <string name="button_name">Run</string>
-    <string name="eingabefeld_name">Landkreis</string>
+    <string name="eingabefeld_hint">Landkreis</string>
 </resources>
