@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         String landkreis;
         int inzidenz = 0;
         String last_update;
-        int todesrate;
+        double todesrate;
         int tode;
         int inzidenz_bl;
         String BL;
@@ -110,11 +111,13 @@ public class MainActivity extends AppCompatActivity {
                     inzidenz = reader1.getInt("cases7_per_100k");
                     last_update = reader1.getString("last_update");
                     inzidenz_bl = reader1.getInt("cases7_bl_per_100k");
-                    todesrate = reader1.getInt("death_rate");
+                    DecimalFormat f = new DecimalFormat("#0.00");
+                    todesrate = reader1.getDouble("death_rate");
+                    String rate = f.format(todesrate);
                     tode = reader1.getInt("deaths");
                     textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall +
                                       "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
-                                      "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + todesrate + "\n\n" + "Stand: " + last_update);
+                                      "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
                     if (inzidenz < 35) {
                         imageView.setImageResource(R.drawable.ampel_gruen);
                     }else if (inzidenz >= 50) {
@@ -132,4 +135,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    //TODO Stadt eingeben und Landkreis wird automatisch ermittelt
+    //TODO Aktuelle Corona Regeln einbinden
+    //TODO Automatische Standorterfassung
+    //TODO Push-Benachrichtigung wenn Ampel auf Rot springt, wenn man den Landkreis wechselt
 }
