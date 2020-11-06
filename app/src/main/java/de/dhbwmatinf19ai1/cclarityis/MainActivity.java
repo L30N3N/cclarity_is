@@ -2,6 +2,8 @@ package de.dhbwmatinf19ai1.cclarityis;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.location.Address;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,12 +18,16 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
         url = "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=GEN,death_rate,cases_per_100k,BL,county,last_update,cases7_per_100k,cases7_bl_per_100k,cases,deaths&returnGeometry=false&outSR=4326&f=json";
         btn = findViewById(R.id.button);
         textView = findViewById(R.id.textView);
@@ -47,20 +52,29 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getJsonFromWeb(url);
+                    String input = editText.getText().toString();
+                    if (input.matches("")){
+                        textView.setVisibility(View.VISIBLE);
+                        textView2.setVisibility(View.GONE);
+                        imageView.setVisibility(View.GONE);
+                        textView.setText("Bitte Ort eingeben!");
+                    }else {
+                        textView.setVisibility(View.GONE);
+                        textView2.setVisibility(View.VISIBLE);
+                        getCounty(input);
+                    }
             }
         });
     }
 
-    public void getJsonFromWeb(String url) {
-
-        String landkreis_ausw = editText.getText().toString();
+    public void getJsonFromWeb(String url, String input) {
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(url)
                 .build();
+
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -76,13 +90,17 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            calculateCases(myResponse, landkreis_ausw);
+                                calculateCases(myResponse, input);
+
                         }
                     });
                 }
             }
         });
     }
+
+
+
 
     public void calculateCases(String json, String landkreis_ausw) {
 
@@ -119,15 +137,19 @@ public class MainActivity extends AppCompatActivity {
                                       "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
                                       "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
                     if (inzidenz < 35) {
+                        imageView.setVisibility(View.VISIBLE);
                         imageView.setImageResource(R.drawable.ampel_gruen);
                     }else if (inzidenz >= 50) {
+                        imageView.setVisibility(View.VISIBLE);
                         imageView.setImageResource(R.drawable.ampel_rot);
                     }else if (inzidenz >= 35 && inzidenz < 50) {
+                        imageView.setVisibility(View.VISIBLE);
                         imageView.setImageResource(R.drawable.ampel_gelb);
                     }
                     break;
                 }else{
                     textView2.setText("Unbekannter Landkreis!");
+                    imageView.setVisibility(View.VISIBLE);
                     imageView.setImageResource(R.drawable.ampel_leer);
                 }
             }
@@ -136,7 +158,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //TODO Stadt eingeben und Landkreis wird automatisch ermittelt
+    public void getCounty(String input) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final GeocoderNominatim geocoderNominatim = new GeocoderNominatim("default-user-agent");
+                try {
+                    List<Address> addresses = geocoderNominatim.getFromLocationName(input, 10);
+                    Address address = addresses.get(0);
+                    String county = address.getSubAdminArea();
+                    if(county == null) {
+                        county = input;
+                    }
+                    String finalCounty = county;
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getJsonFromWeb(url, finalCounty);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
     //TODO Aktuelle Corona Regeln einbinden
     //TODO Automatische Standorterfassung
     //TODO Push-Benachrichtigung wenn Ampel auf Rot springt, wenn man den Landkreis wechselt
