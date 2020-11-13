@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.location.Address;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     }else {
                         textView.setVisibility(View.GONE);
                         textView2.setVisibility(View.VISIBLE);
-                        getCounty(input);
+                        getCoordinates(input);
                     }
             }
         });
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void getCounty(String input) {
+    public void getCoordinates(String input) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -166,15 +167,13 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     List<Address> addresses = geocoderNominatim.getFromLocationName(input, 10);
                     Address address = addresses.get(0);
-                    String county = address.getSubAdminArea();
-                    if(county == null) {
-                        county = input;
-                    }
-                    String finalCounty = county;
+                    String latitiude = Double.toString(address.getLatitude());
+                    String longitude = Double.toString(address.getLongitude());
+
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            getJsonFromWeb(url, finalCounty);
+                            getCounty(latitiude, longitude);
                         }
                     });
                 } catch (Exception e) {
@@ -184,6 +183,43 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    public void getCounty(String latitude, String longitude) {
+        String urladd = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + latitude + "&lon=" + longitude;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(urladd)
+                            .build();
+                    Response responses = null;
+
+                    try {
+                        responses = client.newCall(request).execute();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    String jsonData = responses.body().string();
+                    JSONObject reader = new JSONObject(jsonData);
+                    if (!reader.getJSONObject("address").isNull("county")) {
+                        String county = reader.getJSONObject("address").getString("county");
+                        getJsonFromWeb(url, county);
+                    }else {
+                        String county = editText.getText().toString();
+                        getJsonFromWeb(url, county);
+                    }
+
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    Log.d("Tag", "Kein Wert für county");
+                }
+            }
+        }).start();
+
+    }
 
     //TODO Aktuelle Corona Regeln einbinden
     //TODO Automatische Standorterfassung
