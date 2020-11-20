@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 String test = c.getString("attributes");
                 JSONObject reader1 = new JSONObject(test);
                 landkreis = reader1.getString("GEN");
-                if (landkreis.equals(landkreis_ausw)) {
+                if (landkreis_ausw.contains(landkreis)) {  //landkreis.equals(landkreis_ausw)
                     BL = reader1.getString("BL");
                     anzfall = reader1.getInt("cases");
                     inzidenz = reader1.getInt("cases7_per_100k");
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 }else{
-                    textView2.setText("Unbekannter Landkreis!");
+                    textView2.setText("Keine Informationen gefunden, \n überprüfen Sie Ihre Eingabe");
                     imageView.setVisibility(View.VISIBLE);
                     imageView.setImageResource(R.drawable.ampel_leer);
                 }
