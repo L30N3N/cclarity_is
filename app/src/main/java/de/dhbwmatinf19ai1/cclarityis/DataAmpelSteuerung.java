@@ -1,8 +1,10 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
+import android.app.Activity;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.MainThread;
 
@@ -12,6 +14,7 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -29,10 +32,13 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
     Coronazahlen werte  = new Coronazahlen();
 
 
-    public DataAmpelSteuerung(String eingabe) {
-        this.eingabeTextfeldLocation = eingabe;
+    public DataAmpelSteuerung() {
+
     }
 
+    public void initalize(String eingabe){
+        this.eingabeTextfeldLocation = eingabe;
+    }
     public Coronazahlen runAmpel() throws IOException, JSONException {
             String linkCounty = getCoordinatesLink();
             String responseCounty = getJsonFromWeb(linkCounty);
@@ -145,9 +151,12 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
         return werte;
     }
 
+    public CoronaResponseAsync delegate = null;
+
     @Override
     protected void onPostExecute(Coronazahlen coronazahlen) {
-        super.onPostExecute(coronazahlen);
+
+        delegate.finished(coronazahlen);
     }
 
 }

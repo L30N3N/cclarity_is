@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.location.Address;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +33,7 @@ import okhttp3.Response;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CoronaResponseAsync {
 
     Button btn;
     TextView textView;
@@ -52,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         textView2 = findViewById(R.id.textView2);
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.imageView);
+
+        steuerung = new DataAmpelSteuerung();
+        steuerung.delegate = this;
+
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                     String input = editText.getText().toString();
@@ -63,14 +68,17 @@ public class MainActivity extends AppCompatActivity {
                     }else {
                         textView.setVisibility(View.GONE);
                         textView2.setVisibility(View.VISIBLE);
-                        steuerung = new DataAmpelSteuerung(input);
+                        steuerung.initalize(input);
                         steuerung.execute();
-                        textView2.setText(steuerung.werte.getLankreis());
+                      //  textView2.setText(steuerung.werte.getLankreis());
 
                     }
             }
+
         });
     }
+
+
 
     public void showAmpel() {
         int inzidenz = steuerung.werte.getInzidenzlandkreis();
@@ -86,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void finished(Coronazahlen output) {
+        System.out.println(output.anzfaelle);
+        //Toast.makeText(this, output.anzfaelle,Toast.LENGTH_SHORT).show();
+    }
 
 
     //TODO Aktuelle Corona Regeln einbinden

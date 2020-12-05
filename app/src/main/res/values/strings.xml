@@ -3,4 +3,6 @@
     <string name="button_name">Run</string>
     <string name="eingabefeld_hint">Ort/Landkreis</string>
     <string name="information">Geben Sie einen Ort oder Landkreis ein, um von dessem Landkreis aktuelle Corona-Informationen zu erhalten</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
