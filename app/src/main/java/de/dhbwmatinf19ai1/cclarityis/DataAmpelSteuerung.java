@@ -1,12 +1,19 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.location.Address;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.MainThread;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,14 +38,26 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
 
     Coronazahlen werte  = new Coronazahlen();
 
+    String longitudeAuto;
+
+    String latitudeAuto;
+
+    int methodchooser;
+
+
 
     public DataAmpelSteuerung() {
 
     }
 
-    public void initalize(String eingabe){
+    public void initalize(String eingabe, String longitude, String latitude, int i){
         this.eingabeTextfeldLocation = eingabe;
+        this.longitudeAuto = longitude;
+        this.latitudeAuto = latitude;
+        this.methodchooser = i;
     }
+
+
     public Coronazahlen runAmpel() throws IOException, JSONException {
             String linkCounty = getCoordinatesLink();
             String responseCounty = getJsonFromWeb(linkCounty);
@@ -46,6 +65,15 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
             String responseRKI = getJsonFromWeb(rkiurl);
             calculateCases(responseRKI);
             return werte;
+    }
+
+    public Coronazahlen runAmpelAuto() throws IOException, JSONException {
+        String linkCounty = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + latitudeAuto + "&lon=" + longitudeAuto;
+        String responseCounty = getJsonFromWeb(linkCounty);
+        ausgewaehlterLandkreis = getCounty(responseCounty);
+        String responseRKI = getJsonFromWeb(rkiurl);
+        calculateCases(responseRKI);
+        return werte;
     }
 
 //    public void executeAmpel() {
@@ -134,6 +162,7 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
             String county = reader.getJSONObject("address").getString("county");
             return county;
         }else {
+            eingabeTextfeldLocation = reader.getJSONObject("address").getString("city");
             return eingabeTextfeldLocation;
         }
     }
@@ -142,7 +171,14 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
     @Override
     protected Coronazahlen doInBackground(Void... voids) {
         try {
-            runAmpel();
+            switch(methodchooser) {
+                case 0:
+                    runAmpel();
+                    break;
+                case 1:
+                    runAmpelAuto();
+                    break;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

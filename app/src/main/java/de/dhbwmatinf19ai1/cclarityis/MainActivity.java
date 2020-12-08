@@ -1,18 +1,27 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Address;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -40,8 +49,15 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
     TextView textView2;
     EditText editText;
     ImageView imageView;
+    ImageButton standortbtn;
+    String LastLatitudeS;
+    String LastLongitudeS;
+    String input;
 
     DataAmpelSteuerung steuerung;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private String Ergebnis = "null";
 
 
     @Override
@@ -53,11 +69,13 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         textView2 = findViewById(R.id.textView2);
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.imageView);
+        standortbtn = findViewById(R.id.standortbtn);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                    String input = editText.getText().toString();
+                    input = editText.getText().toString();
                     if (input.matches("")){
                         textView.setVisibility(View.VISIBLE);
                         textView2.setVisibility(View.GONE);
@@ -68,11 +86,23 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
                         steuerung.delegate = MainActivity.this;
                         textView.setVisibility(View.GONE);
                         textView2.setVisibility(View.VISIBLE);
-                        steuerung.initalize(input);
+                        steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 0);
                         steuerung.execute();
                     }
             }
         });
+
+        standortbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                steuerung = new DataAmpelSteuerung();
+                steuerung.delegate = MainActivity.this;
+                getLocation();
+                steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 1);
+                steuerung.execute();
+            }
+        });
+
     }
 
 
@@ -109,6 +139,36 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         showAmpel();
     }
 
+
+
+    public void getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("in getlocation");
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        double LastLatitude;
+                        double LastLongitude;
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // createGeofence(location.getLongitude(), location.getLatitude(), 1000); //GeofenceCreateAufruf
+                            LastLatitude = location.getLatitude();
+                            LastLongitude = location.getLongitude();
+                            LastLatitudeS = Double.toString(LastLatitude);
+                            LastLongitudeS = Double.toString(LastLongitude);
+                            System.out.println(LastLatitude + " " +  LastLongitude);
+                        }else{
+                            System.out.println("keine location empfangen");
+                            LastLatitude = 360;
+                            LastLongitude = 360;
+                        }
+                    }
+                });
+        //TODO Achtung bug Ergebnis wird sofort zurückgegeben
+    }
 
     //TODO Aktuelle Corona Regeln einbinden
     //TODO Automatische Standorterfassung
