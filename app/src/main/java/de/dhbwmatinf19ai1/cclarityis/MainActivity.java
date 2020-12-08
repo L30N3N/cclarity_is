@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.imageView);
 
-        steuerung = new DataAmpelSteuerung();
+        steuerung = new DataAmpelSteuerung(); //TODO muss irgendwie in die onClick, weil task nur einmal ausgeführt werden darf
         steuerung.delegate = this;
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -70,11 +70,8 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
                         textView2.setVisibility(View.VISIBLE);
                         steuerung.initalize(input);
                         steuerung.execute();
-                      //  textView2.setText(steuerung.werte.getLankreis());
-
                     }
             }
-
         });
     }
 
@@ -96,8 +93,20 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
 
     @Override
     public void finished(Coronazahlen output) {
-        System.out.println(output.anzfaelle);
-        //Toast.makeText(this, output.anzfaelle,Toast.LENGTH_SHORT).show();
+        int inzidenz = output.getInzidenzlandkreis();
+        int anzfall = output.getAnzfaelle();
+        String landkreis = output.getLankreis();
+        String BL = output.getBundesland();
+        int inzidenz_bl = output.getInzidenzbundesland();
+        int tode = output.getTode();
+        String rate = output.getTodesrate();
+        String last_update = output.getStand();
+
+        textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall +
+                "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
+                "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
+
+        showAmpel();
     }
 
 
