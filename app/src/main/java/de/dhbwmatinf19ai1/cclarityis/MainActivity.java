@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.imageView);
 
-        steuerung = new DataAmpelSteuerung(); //TODO muss irgendwie in die onClick, weil task nur einmal ausgeführt werden darf
-        steuerung.delegate = this;
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -66,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
                         imageView.setVisibility(View.GONE);
                         textView.setText("Bitte Ort eingeben!");
                     }else {
+                        steuerung = new DataAmpelSteuerung();
+                        steuerung.delegate = MainActivity.this;
                         textView.setVisibility(View.GONE);
                         textView2.setVisibility(View.VISIBLE);
                         steuerung.initalize(input);
