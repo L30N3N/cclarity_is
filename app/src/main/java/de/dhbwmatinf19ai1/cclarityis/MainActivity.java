@@ -42,7 +42,7 @@ import okhttp3.Response;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
 
-public class MainActivity extends AppCompatActivity implements CoronaResponseAsync {
+public class MainActivity extends AppCompatActivity implements CoronaResponseAsync, LocationAsync {
 
     Button btn;
     TextView textView;
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
     String input;
 
     DataAmpelSteuerung steuerung;
+    AutoLocation location;
 
     private FusedLocationProviderClient fusedLocationClient;
     private String Ergebnis = "null";
@@ -95,17 +96,15 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         standortbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                steuerung = new DataAmpelSteuerung();
-                steuerung.delegate = MainActivity.this;
-                getLocation();
-                steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 1);
-                steuerung.execute();
+                textView.setVisibility(View.GONE);
+                textView2.setVisibility(View.VISIBLE);
+                location = new AutoLocation(MainActivity.this);
+                location.delegater = MainActivity.this;
+                location.initialize();
             }
         });
 
     }
-
-
 
     public void showAmpel() {
         int inzidenz = steuerung.werte.getInzidenzlandkreis();
@@ -139,35 +138,14 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         showAmpel();
     }
 
-
-
-    public void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("in getlocation");
-            return;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        double LastLatitude;
-                        double LastLongitude;
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // createGeofence(location.getLongitude(), location.getLatitude(), 1000); //GeofenceCreateAufruf
-                            LastLatitude = location.getLatitude();
-                            LastLongitude = location.getLongitude();
-                            LastLatitudeS = Double.toString(LastLatitude);
-                            LastLongitudeS = Double.toString(LastLongitude);
-                            System.out.println(LastLatitude + " " +  LastLongitude);
-                        }else{
-                            System.out.println("keine location empfangen");
-                            LastLatitude = 360;
-                            LastLongitude = 360;
-                        }
-                    }
-                });
-        //TODO Achtung bug Ergebnis wird sofort zurückgegeben
+    @Override
+    public void finishedLocation(LocationData output) {
+        steuerung = new DataAmpelSteuerung();
+        steuerung.delegate = MainActivity.this;
+        LastLatitudeS =  output.getLatitude();
+        LastLongitudeS = output.getLongitude();
+        steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 1);
+        steuerung.execute();
     }
 
     //TODO Aktuelle Corona Regeln einbinden
