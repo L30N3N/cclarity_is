@@ -1,5 +1,8 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
+/**
+ * @author Yannick Schroth
+ */
 public class LocationData {
 
     String longitude;

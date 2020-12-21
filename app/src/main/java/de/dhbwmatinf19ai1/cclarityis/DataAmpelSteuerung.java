@@ -1,19 +1,11 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
+
 import android.location.Address;
-import android.location.Location;
+
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 
-import androidx.annotation.MainThread;
-import androidx.core.app.ActivityCompat;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,13 +13,16 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+/**
+ * @author Yannick Schroth, Tobias Schweikart
+ */
 
 public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
     String eingabeTextfeldLocation;
@@ -85,6 +80,7 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
         Response responses = null;
 
             responses = client.newCall(request).execute();
+            Log.d("Web-Request", "Web-Abfrage für JSON");
         return responses.body().string();
     }
 
@@ -114,8 +110,10 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
                     double todesrate = reader1.getDouble("death_rate");
                     werte.setTodesrate(f.format(todesrate));
                     werte.setTode(reader1.getInt("deaths"));
+                    Log.d("Werte", "Werte für Landkreis gesetzt");
                     break;
                 }else{
+                    Log.d("Werte", "Werte konnten nicht gesetzt werden");
                 }
             }
         } catch (JSONException e) {
@@ -132,9 +130,10 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
             String latitude = Double.toString(address.getLatitude());
             String longitude = Double.toString(address.getLongitude());
             urladd = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + latitude + "&lon=" + longitude;
+            Log.d("Koordinaten", "Koordinaten wurden ermittelt");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("Tag", "Ort nicht gefunden");
+            Log.d("Koordinaten", "Koordinaten nicht gefunden");
         }
         return urladd;
     }
@@ -149,10 +148,13 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
         }else {
             if (reader.getJSONObject("address").has("town")) {
                 eingabeTextfeldLocation = reader.getJSONObject("address").getString("town");
+                Log.d("Landkreisermittlung", "Über town gefunden");
             }else if(reader.getJSONObject("address").has("state") && reader.getJSONObject("address").has("city")) {
                 eingabeTextfeldLocation = reader.getJSONObject("address").getString("city");
+                Log.d("Landkreisermittlung", "Über city gefunden");
             }else if(reader.getJSONObject("address").has("state")) {
                 eingabeTextfeldLocation = reader.getJSONObject("address").getString("state");
+                Log.d("Landkreisermittlung", "Über state gefunden");
             }
             return eingabeTextfeldLocation;
         }
@@ -165,9 +167,11 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
             switch(methodchooser) {
                 case 0:
                     runAmpel();
+                    Log.d("Ausführung", "Methoden über Textfeldeingabe");
                     break;
                 case 1:
                     runAmpelAuto();
+                    Log.d("Ausführung", "Methoden über automatische Ermittlung");
                     break;
             }
         } catch (IOException e) {

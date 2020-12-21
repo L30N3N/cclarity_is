@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+/**
+ * @author Yannick Schroth
+ */
 
 public class FactFragment extends Fragment implements CoronaResponseAsync, LocationAsync {
 
@@ -57,12 +61,14 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                     textView2.setVisibility(View.GONE);
                     imageView.setVisibility(View.GONE);
                     textView.setText("Bitte Ort eingeben!");
+                    Log.d("Start", "Nichts in Textfeld eingegeben");
                 }else {
                     steuerung = new DataAmpelSteuerung();
                     steuerung.delegate = FactFragment.this;
                     textView.setVisibility(View.GONE);
                     steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 0);
                     steuerung.execute();
+                    Log.d("Start", "Start über Textfeldeingabe");
                 }
             }
         });
@@ -74,6 +80,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                 location = new AutoLocation(getContext());
                 location.delegater = FactFragment.this;
                 location.initialize();
+                Log.d("Start", "Start über automatische Standortermittlung");
             }
         });
         return root;
@@ -84,12 +91,15 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         if (inzidenz < 35) {
             imageView.setVisibility(View.VISIBLE);
             imageView.setImageResource(R.drawable.ampel_gruen);
+            Log.d("Ampel", "Grüne Ampel");
         }else if (inzidenz >= 50) {
             imageView.setVisibility(View.VISIBLE);
             imageView.setImageResource(R.drawable.ampel_rot);
+            Log.d("Ampel", "Rote Ampel");
         }else if (inzidenz >= 35 && inzidenz < 50) {
             imageView.setVisibility(View.VISIBLE);
             imageView.setImageResource(R.drawable.ampel_gelb);
+            Log.d("Ampel", "Gelbe Ampel");
         }
     }
 
@@ -108,12 +118,13 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
             imageView.setVisibility(View.GONE);
             textView.setText("Es konnten keine Daten ermittelt werden");
             textView.setVisibility(View.VISIBLE);
+            Log.d("Ausgabe", "Keine Daten gefunden");
         } else {
             textView2.setVisibility(View.VISIBLE);
             textView2.setText(landkreis + "\n" + "(" + BL + ")" + "\n\n" + "Anzahl der Fälle: " + anzfall +
                     "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
                     "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
-
+            Log.d("Ausgabe", "Daten ausgegeben");
             showAmpel();
         }
     }
