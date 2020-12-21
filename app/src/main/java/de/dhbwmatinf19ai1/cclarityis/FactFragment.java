@@ -56,13 +56,13 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 input = editText.getText().toString();
-                if (input.matches("")){
+                if (input.matches("")){ //Wird aufgerufen, wenn nichts eingegeben wurde
                     textView.setVisibility(View.VISIBLE);
                     textView2.setVisibility(View.GONE);
                     imageView.setVisibility(View.GONE);
                     textView.setText("Bitte Ort eingeben!");
                     Log.d("Start", "Nichts in Textfeld eingegeben");
-                }else {
+                }else { //Knopfdruch bei Eingabe führt folgende Methoden aus
                     steuerung = new DataAmpelSteuerung();
                     steuerung.delegate = FactFragment.this;
                     textView.setVisibility(View.GONE);
@@ -75,7 +75,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
 
         standortbtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { //Onclick für die automatische Standortermittlung
                 textView.setVisibility(View.GONE);
                 location = new AutoLocation(getContext());
                 location.delegater = FactFragment.this;
@@ -86,6 +86,9 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         return root;
     }
 
+    /**
+     * Ampel wird entsprechend des Inzidenzwertes vom Landkreis angezeigt
+     */
     public void showAmpel() {
         int inzidenz = steuerung.werte.getInzidenzlandkreis();
         if (inzidenz < 35) {
@@ -103,8 +106,13 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         }
     }
 
+    /**
+     * Implementierte Methode vom Interface CoronaResponseAsync
+     * @param output --> Liefert das entsprechende Objekt aus der Klasse DataAmpelSteuerung
+     */
     @Override
     public void finished(Coronazahlen output) {
+        //Variablen mit entsprechenden Werten füllen
         int inzidenz = output.getInzidenzlandkreis();
         int anzfall = output.getAnzfaelle();
         String landkreis = output.getLankreis();
@@ -113,22 +121,28 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         int tode = output.getTode();
         String rate = output.getTodesrate();
         String last_update = output.getStand();
-        if (landkreis == null) {
+
+        if (landkreis == null) { //Wenn kein Landkreis ermittelt werden konnte
             textView2.setVisibility(View.GONE);
             imageView.setVisibility(View.GONE);
             textView.setText("Es konnten keine Daten ermittelt werden");
             textView.setVisibility(View.VISIBLE);
             Log.d("Ausgabe", "Keine Daten gefunden");
-        } else {
+        } else { //Wenn ein Landkreis ermittelt wurde
             textView2.setVisibility(View.VISIBLE);
             textView2.setText(landkreis + "\n" + "(" + BL + ")" + "\n\n" + "Anzahl der Fälle: " + anzfall +
                     "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
-                    "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
+                    "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update); //Ausgabe der Werte
             Log.d("Ausgabe", "Daten ausgegeben");
-            showAmpel();
+            showAmpel(); //Entsprechende Ampel wird angezeigt
         }
     }
 
+
+    /**
+     * Implementierte Methode vom Interface LocationAsync
+     * @param output --> Liefert benötigte Koordinaten (Longitude und Latitude)
+     */
     @Override
     public void finishedLocation(LocationData output) {
         steuerung = new DataAmpelSteuerung();

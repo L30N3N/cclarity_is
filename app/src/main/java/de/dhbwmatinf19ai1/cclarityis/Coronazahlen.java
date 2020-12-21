@@ -3,6 +3,7 @@ package de.dhbwmatinf19ai1.cclarityis;
 
 /**
  * @author Yannick Schroth
+ * Klasse zum Setzen und Abfragen der wichtigsten Informationen
  */
 public class Coronazahlen {
 

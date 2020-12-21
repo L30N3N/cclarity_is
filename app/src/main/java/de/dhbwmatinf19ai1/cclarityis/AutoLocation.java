@@ -26,14 +26,25 @@ public class AutoLocation {
 
     private Context context;
 
+    /**
+     * Konstruktor
+     * @param context --> Übergabe des Context
+     */
     public AutoLocation(Context context) {
         this.context = context;
     }
 
+    /**
+     * Initialisierungs-Methode ruft die benötigte Methode auf
+     */
     public void initialize() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         getLocation();
     }
+
+    /**
+     * Methde zur Abfrage der Aktuellen Koordinaten --> Setzt Longitude und Latitude in der Klasse LocationData
+     */
     public void getLocation() {
         LocationData data = new LocationData();
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -51,11 +62,11 @@ public class AutoLocation {
                         if (location != null) {
                             LastLatitude = location.getLatitude();
                             LastLongitude = location.getLongitude();
-                            LastLatitudeS = Double.toString(LastLatitude);
-                            LastLongitudeS = Double.toString(LastLongitude);
-                            data.setLatitude(LastLatitudeS);
-                            data.setLongitude(LastLongitudeS);
-                            delegater.finishedLocation(data);
+                            LastLatitudeS = Double.toString(LastLatitude); //Umwandlung in String für die Spätere Verwendung in der URL
+                            LastLongitudeS = Double.toString(LastLongitude); //Umwandlung in String für die Spätere Verwendung in der URL
+                            data.setLatitude(LastLatitudeS);   //Setzen der Latitude
+                            data.setLongitude(LastLongitudeS); //Setzen der Longitude
+                            delegater.finishedLocation(data); //Übergabe des Objekts an das Interface, um es entsprechend zu nutzen
                             Log.d("autolocation", "Koordinaten: " + LastLatitude + " " +  LastLongitude);
                         }else{
                             Log.d("autolocation", "Koordinaten konnten nicht ermittelt werden");
