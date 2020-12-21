@@ -17,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import de.dhbwmatinf19ai1.cclarityis.Rules.RulesFragment;
+
 
 /**
  * @author Yannick Schroth
@@ -36,6 +38,11 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
 
     DataAmpelSteuerung steuerung;
     AutoLocation location;
+    RulesFragment rf;
+
+    public void setRulesFragment(RulesFragment rf) {
+        this.rf = rf;
+    }
 
 
 
@@ -146,6 +153,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                     "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update); //Ausgabe der Werte
             Log.d("Ausgabe", "Daten ausgegeben");
             showAmpel(); //Entsprechende Ampel wird angezeigt
+            rf.getJsonFromWeb1("https://tourismus-wegweiser.de/json/", BL);
         }
     }
 

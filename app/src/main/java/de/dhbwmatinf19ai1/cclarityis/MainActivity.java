@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import de.dhbwmatinf19ai1.cclarityis.Geofences.GeofenceHelper;
+import de.dhbwmatinf19ai1.cclarityis.Rules.RulesFragment;
 
 /**
  * @author Yannick Schroth, Tobias Schweikart, Leon Nehring
@@ -33,10 +34,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
 
         FactFragment factFragment = new FactFragment();
+        RulesFragment rulesFragment = new RulesFragment();
+        factFragment.setRulesFragment(rulesFragment);
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction()
                 .replace(R.id.fragment1, factFragment, factFragment.getTag())
+                .replace(R.id.fragment2, rulesFragment, rulesFragment.getTag())
                 .commit();
+
+
+
 
         //Überprüfung, ob Standortabfrage erlaubt wurde
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
