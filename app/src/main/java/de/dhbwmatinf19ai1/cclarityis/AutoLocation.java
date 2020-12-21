@@ -34,7 +34,6 @@ public class AutoLocation {
     public void getLocation() {
         LocationData data = new LocationData();
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("in getlocation");
             return;
         }
         fusedLocationClient.getLastLocation()

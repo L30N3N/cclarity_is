@@ -76,21 +76,6 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
         return werte;
     }
 
-//    public void executeAmpel() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    runAmpel();
-//                    Log.d("Tag", "test " + werte.getAnzfaelle());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//    }
 
     public String getJsonFromWeb(String url) throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -162,7 +147,13 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
             String county = reader.getJSONObject("address").getString("county");
             return county;
         }else {
-            eingabeTextfeldLocation = reader.getJSONObject("address").getString("city");
+            if (reader.getJSONObject("address").has("town")) {
+                eingabeTextfeldLocation = reader.getJSONObject("address").getString("town");
+            }else if(reader.getJSONObject("address").has("state") && reader.getJSONObject("address").has("city")) {
+                eingabeTextfeldLocation = reader.getJSONObject("address").getString("city");
+            }else if(reader.getJSONObject("address").has("state")) {
+                eingabeTextfeldLocation = reader.getJSONObject("address").getString("state");
+            }
             return eingabeTextfeldLocation;
         }
     }
@@ -182,6 +173,8 @@ public class DataAmpelSteuerung extends AsyncTask<Void, Void, Coronazahlen> {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
             e.printStackTrace();
         }
         return werte;

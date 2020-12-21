@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
                         steuerung = new DataAmpelSteuerung();
                         steuerung.delegate = MainActivity.this;
                         textView.setVisibility(View.GONE);
-                        textView2.setVisibility(View.VISIBLE);
                         steuerung.initalize(input, LastLongitudeS, LastLatitudeS, 0);
                         steuerung.execute();
                     }
@@ -93,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
             @Override
             public void onClick(View v) {
                 textView.setVisibility(View.GONE);
-                textView2.setVisibility(View.VISIBLE);
                 location = new AutoLocation(MainActivity.this);
                 location.delegater = MainActivity.this;
                 location.initialize();
@@ -126,12 +124,19 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         int tode = output.getTode();
         String rate = output.getTodesrate();
         String last_update = output.getStand();
+        if (landkreis == null) {
+            textView2.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
+            textView.setText("Es konnten keine Daten ermittelt werden");
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            textView2.setVisibility(View.VISIBLE);
+            textView2.setText(landkreis + "\n" + "(" + BL + ")" + "\n\n" + "Anzahl der Fälle: " + anzfall +
+                    "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
+                    "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
 
-        textView2.setText(landkreis + "\n" + "(" + BL + ")"+  "\n\n" + "Anzahl der Fälle: " + anzfall +
-                "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
-                "\n\n" + "Todesfälle: " + tode + "\n\n" + "Todesrate: " + rate + "\n\n" + "Stand: " + last_update);
-
-        showAmpel();
+            showAmpel();
+        }
     }
 
     @Override
