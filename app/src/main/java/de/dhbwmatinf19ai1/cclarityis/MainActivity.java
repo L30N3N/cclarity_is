@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -57,9 +58,6 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
     DataAmpelSteuerung steuerung;
     AutoLocation location;
 
-    private FusedLocationProviderClient fusedLocationClient;
-    private String Ergebnis = "null";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements CoronaResponseAsy
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.imageView);
         standortbtn = findViewById(R.id.standortbtn);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
