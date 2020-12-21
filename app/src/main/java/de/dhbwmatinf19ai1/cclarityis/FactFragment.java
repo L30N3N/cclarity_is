@@ -1,7 +1,10 @@
 package de.dhbwmatinf19ai1.cclarityis;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -76,11 +79,19 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         standortbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //Onclick für die automatische Standortermittlung
-                textView.setVisibility(View.GONE);
-                location = new AutoLocation(getContext());
-                location.delegater = FactFragment.this;
-                location.initialize();
-                Log.d("Start", "Start über automatische Standortermittlung");
+                if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED){ //Überprüfung der Standorterlaubnis
+                    textView.setVisibility(View.VISIBLE);
+                    textView2.setVisibility(View.GONE);
+                    imageView.setVisibility(View.GONE);
+                    textView.setText("Automatische Standortermittlung nicht möglich, bestätigen Sie zuvor die entsprechende Erlaubnis");
+                    Log.d("Start", "Methoden wurde aufgrund fehlender Berechtigungen nicht ausgeführt");
+                }else {
+                    textView.setVisibility(View.GONE);
+                    location = new AutoLocation(getContext());
+                    location.delegater = FactFragment.this;
+                    location.initialize();
+                    Log.d("Start", "Start über automatische Standortermittlung");
+                }
             }
         });
         return root;
