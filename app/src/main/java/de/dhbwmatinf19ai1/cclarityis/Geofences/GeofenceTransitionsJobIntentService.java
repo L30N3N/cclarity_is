@@ -100,7 +100,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService implem
                     geoClient);
 
 
-            sendNotification("Dein Standort hat sich geändert.");
+            sendNotification("Ihr Standort hat sich geändert.");
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
