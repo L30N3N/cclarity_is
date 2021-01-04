@@ -127,4 +127,13 @@ public class RulesFragment extends Fragment {
         }
     }
 
+    public void showList(Boolean show) {
+        if(show) {
+            expandableListView.setVisibility(View.VISIBLE);
+        }else {
+            expandableListView.setVisibility(View.GONE);
+        }
+
+    }
+
 }

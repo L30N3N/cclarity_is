@@ -35,6 +35,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
     String LastLatitudeS;
     String LastLongitudeS;
     String input;
+    TextView loader;
 
     DataAmpelSteuerung steuerung;
     AutoLocation location;
@@ -58,12 +59,15 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_fact, container, false);
+        View ruleroot = inflater.inflate(R.layout.fragment_rules, container, false);
+
         btn = root.findViewById(R.id.button);
         textView = root.findViewById(R.id.textView);
         textView2 = root.findViewById(R.id.textView2);
         editText = root.findViewById(R.id.editTextTextPersonName);
         imageView = root.findViewById(R.id.imageView);
         standortbtn = root.findViewById(R.id.standortbtn);
+        loader = root.findViewById(R.id.loader);
 
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -75,6 +79,8 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                     textView.setText("Bitte Ort eingeben!");
                     Log.d("Start", "Nichts in Textfeld eingegeben");
                 }else { //Knopfdruch bei Eingabe führt folgende Methoden aus
+                    hideData();
+                    loader.setVisibility(View.VISIBLE);
                     steuerung = new DataAmpelSteuerung();
                     steuerung.delegate = FactFragment.this;
                     textView.setVisibility(View.GONE);
@@ -106,11 +112,20 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         return root;
     }
 
+    public void hideData() {
+        rf.showList(false);
+        textView2.setVisibility(View.GONE);
+        imageView.setVisibility(View.GONE);
+    }
+
     public void setLocationGeofence(){
         geofencereact = true;
     }
 
+
     private void locationbuttonclick(){
+        hideData();
+        loader.setVisibility(View.VISIBLE);
         textView.setVisibility(View.GONE);
         location = new AutoLocation(getContext());
         location.delegater = FactFragment.this;
@@ -161,6 +176,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
             textView.setVisibility(View.VISIBLE);
             Log.d("Ausgabe", "Keine Daten gefunden");
         } else { //Wenn ein Landkreis ermittelt wurde
+            loader.setVisibility(View.GONE);
             textView2.setVisibility(View.VISIBLE);
             textView2.setText(landkreis + "\n" + "(" + BL + ")" + "\n\n" + "Anzahl der Fälle: " + anzfall +
                     "\n\n" + "Inzidenzwert: " + inzidenz + "\n\n" + "Inzidenzwert (BL): " + inzidenz_bl +
@@ -168,6 +184,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
             Log.d("Ausgabe", "Daten ausgegeben");
             showAmpel(); //Entsprechende Ampel wird angezeigt
             rf.getJsonFromWeb1("https://tourismus-wegweiser.de/json/", BL);
+            rf.showList(true);
         }
     }
 

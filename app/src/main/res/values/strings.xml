@@ -27,4 +27,5 @@
     <string name="geofence_transition_notification_text">
         Click notification to return to app
     </string>
+    <string name="lade_daten">Lade Daten...</string>
 </resources>
