@@ -6,9 +6,11 @@ import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import de.dhbwmatinf19ai1.cclarityis.Geofences.GeofenceHelper;
+import de.dhbwmatinf19ai1.cclarityis.Geofences.GeofenceTransitionsJobIntentService;
 import de.dhbwmatinf19ai1.cclarityis.Rules.RulesFragment;
 
 /**
@@ -44,20 +47,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-        //Überprüfung, ob Standortabfrage erlaubt wurde
+               //Überprüfung, ob Standortabfrage erlaubt wurde
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("Erlaubnis", "Standorerlaubnis gewährt");
         }else{
             Log.d("Erlaubnis", "Standorterlaubnis nicht gewährt");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 1);
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        setupGeofence();
+
+        Intent receivedIntent = this.getIntent();
+        if (receivedIntent != null && receivedIntent.hasExtra(Intent.EXTRA_TEXT)) {
+            String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
+            // Die empfangenen Daten können nun verwendet werden ...
+            maketoast("Funzt");
+            factFragment.setLocationGeofence();
+        }else{
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            setupGeofence();
+        }
     }
 
     private void setupGeofence(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -65,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Log.d("Geo","No Permission");
+            ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.ACCESS_BACKGROUND_LOCATION},1);
             return;
         }
         Context context = this;
@@ -89,9 +102,4 @@ public class MainActivity extends AppCompatActivity {
     public void maketoast(String content){
         Toast.makeText(this,content, Toast.LENGTH_SHORT).show();
     }
-
-
-    //TODO Aktuelle Corona Regeln einbinden
-    //TODO Automatische Standorterfassung
-    //TODO Push-Benachrichtigung wenn Ampel auf Rot springt, wenn man den Landkreis wechselt
 }

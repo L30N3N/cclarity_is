@@ -1,18 +1,35 @@
 package de.dhbwmatinf19ai1.cclarityis.Geofences;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import androidx.core.app.JobIntentService;
+import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.List;
 
+import de.dhbwmatinf19ai1.cclarityis.CoronaResponseAsync;
+import de.dhbwmatinf19ai1.cclarityis.Coronazahlen;
+import de.dhbwmatinf19ai1.cclarityis.DataAmpelSteuerung;
+import de.dhbwmatinf19ai1.cclarityis.FactFragment;
+import de.dhbwmatinf19ai1.cclarityis.MainActivity;
 import de.dhbwmatinf19ai1.cclarityis.R;
 
 /**
@@ -22,7 +39,7 @@ import de.dhbwmatinf19ai1.cclarityis.R;
  * the transition type and geofence id(s) that triggered the transition. Creates a notification
  * as the output.
  */
-public class GeofenceTransitionsJobIntentService extends JobIntentService {
+public class GeofenceTransitionsJobIntentService extends JobIntentService implements CoronaResponseAsync{
 
     private static final int JOB_ID = 573;
 
@@ -30,6 +47,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
     private static final String CHANNEL_ID = "channel_01";
 
+    DataAmpelSteuerung steuerung;
     /**
      * Convenience method for enqueuing work in to this service.
      */
@@ -58,6 +76,17 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
+
+            /*
+            //Aufruf der Coronazahlenabfrage
+            try {
+                checkCoronaZahlen(geofencingEvent.getTriggeringLocation().getLatitude(), geofencingEvent.getTriggeringLocation().getLongitude());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }*/
+
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
@@ -70,20 +99,51 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
                     geoClient);
 
 
-
+            sendNotification("Dein Standort hat sich gändert.");
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
         }
     }
 
+    private void checkCoronaZahlen(double Latitude, double Longitude) throws IOException, JSONException {
+        steuerung = new DataAmpelSteuerung();
+        steuerung.delegate = GeofenceTransitionsJobIntentService.this;
+        steuerung.initalize("Viernheim", String.valueOf(Longitude), String.valueOf(Latitude), 1);
+        steuerung.execute();
+    }
 
+
+
+
+    /**
+     * Maps geofence transition types to their human-readable equivalents.
+     *
+     * @param transitionType    A transition type constant defined in Geofence
+     * @return                  A String indicating the type of transition
+     */
+    private String getTransitionString(int transitionType) {
+        switch (transitionType) {
+            case Geofence.GEOFENCE_TRANSITION_ENTER:
+                return getString(R.string.geofence_transition_entered);
+            case Geofence.GEOFENCE_TRANSITION_EXIT:
+                return getString(R.string.geofence_transition_exited);
+            default:
+                return getString(R.string.unknown_geofence_transition);
+        }
+    }
+
+    @Override
+    public void finished(Coronazahlen output) {
+        Log.d("geoCorona","Ich habe Werte"+output.getInzidenzlandkreis());
+        sendNotification("Die  aktuelle Inzidenzzahl im Landkreis "+output.getLankreis()+" beträgt: "+output.getInzidenzlandkreis());
+    }
 
     /**
      * Posts a notification in the notification bar when a transition is detected.
      * If the user clicks the notification, control goes to the MainActivity.
      */
-    /*private void sendNotification(String notificationDetails) {
+    private void sendNotification(String notificationDetails) {
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -101,6 +161,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+        notificationIntent.putExtra(Intent.EXTRA_TEXT,"Lebende_Ampel");
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -119,11 +180,11 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher)
+        builder.setSmallIcon(R.drawable.ic_launcher_background)
                 // In a real app, you may want to use a library like Volley
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_launcher))
+                        R.drawable.ic_launcher_background))
                 .setColor(Color.RED)
                 .setContentTitle(notificationDetails)
                 .setContentText(getString(R.string.geofence_transition_notification_text))
@@ -139,22 +200,5 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
-    }*/
-
-    /**
-     * Maps geofence transition types to their human-readable equivalents.
-     *
-     * @param transitionType    A transition type constant defined in Geofence
-     * @return                  A String indicating the type of transition
-     */
-    private String getTransitionString(int transitionType) {
-        switch (transitionType) {
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                return getString(R.string.geofence_transition_entered);
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                return getString(R.string.geofence_transition_exited);
-            default:
-                return getString(R.string.unknown_geofence_transition);
-        }
     }
 }

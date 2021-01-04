@@ -40,6 +40,8 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
     AutoLocation location;
     RulesFragment rf;
 
+    boolean geofencereact = false;
+
     public void setRulesFragment(RulesFragment rf) {
         this.rf = rf;
     }
@@ -93,15 +95,27 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                     textView.setText("Automatische Standortermittlung nicht möglich, bestätigen Sie zuvor die entsprechende Erlaubnis");
                     Log.d("Start", "Methoden wurde aufgrund fehlender Berechtigungen nicht ausgeführt");
                 }else {
-                    textView.setVisibility(View.GONE);
-                    location = new AutoLocation(getContext());
-                    location.delegater = FactFragment.this;
-                    location.initialize();
-                    Log.d("Start", "Start über automatische Standortermittlung");
+                   locationbuttonclick();
                 }
             }
         });
+        if(geofencereact == true){
+            geofencereact = false;
+            locationbuttonclick();
+        }
         return root;
+    }
+
+    public void setLocationGeofence(){
+        geofencereact = true;
+    }
+
+    private void locationbuttonclick(){
+        textView.setVisibility(View.GONE);
+        location = new AutoLocation(getContext());
+        location.delegater = FactFragment.this;
+        location.initialize();
+        Log.d("Start", "Start über automatische Standortermittlung");
     }
 
     /**

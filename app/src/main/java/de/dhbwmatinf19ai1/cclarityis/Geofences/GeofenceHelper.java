@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -20,9 +19,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
-import static com.google.android.gms.common.util.CollectionUtils.listOf;
 
 public class GeofenceHelper{
     private Context context;
@@ -90,11 +86,11 @@ public class GeofenceHelper{
                         Log.d("GeofenceHelper","Geofence Added");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("GeofenceHelper","Geofence added Failed");
-                }
-        });
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("GeofenceHelper","Geofence added Failed");
+                    }
+                });
     }
 
 
