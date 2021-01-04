@@ -1,6 +1,6 @@
 # cclarity_is
-Mobile App
-Mitarbeitende: Tobias, Yannick & Leon
+Mobile App <br>
+Mitarbeitende: Tobias, Yannick & Leon <br>
 Github: https://github.com/L30N3N/cclarity_is
 
 Corona Fallzahlen & Regeln der 16 Bundesländer.
