@@ -30,6 +30,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * @author Leon Nehring
+ */
 public class RulesFragment extends Fragment {
 
     RulesAdapter adapter;
@@ -79,7 +82,7 @@ public class RulesFragment extends Fragment {
                 if (response.isSuccessful()) {
                     final String myResponse = response.body().string();
 
-                    Log.d("API", myResponse);
+                    Log.d("RulesAPI", "Abfrage Erfolgreich");
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -98,33 +101,24 @@ public class RulesFragment extends Fragment {
         HashMap<String, ArrayList<String>> elements_text = new HashMap<>();
         try {
             JSONArray reader = new JSONArray(response);
-            Log.d("RulesAPI", reader.length() + "");
             for (int i = 0; i < reader.length(); i++) {
                 JSONObject o = reader.getJSONObject(i);
 
-                String bundeslaend = o.getString("Bundesland");
-                Log.d("RulesAPI", "Bundesland " + i + ": " + bundeslaend);
-                if(bundeslaend.equalsIgnoreCase(bl)) {
+                String bundesland = o.getString("Bundesland");
+                if(bundesland.equalsIgnoreCase(bl)) {
                     JSONObject a = o.getJSONObject("allgemein");
                     Iterator iterator = a.keys();
+                    Log.d("RulesAPI", "Bundesland " + i + ": " + bundesland);
                     while(iterator.hasNext()){
                         String key = iterator.next().toString();
                         JSONObject obj = a.getJSONObject(key);
-                        Log.d("RulesAPI", "Element: " + Html.fromHtml(key).toString());
                         element_title.add(Html.fromHtml(key).toString());
                         ArrayList<String> arr = new ArrayList<>();
                         arr.add(Html.fromHtml(obj.getString("text")).toString());
-                        Log.d("RulesAPI", "Array " + arr.get(0));
                         elements_text.put(key, arr);
                     }
-
-
-
-
-
                     break;
                 }
-
             }
             adapter = new RulesAdapter(element_title, elements_text);
             expandableListView.setAdapter(adapter);

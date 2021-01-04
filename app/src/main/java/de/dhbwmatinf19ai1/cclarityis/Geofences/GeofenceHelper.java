@@ -20,6 +20,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tobias Schweikart
+ */
 public class GeofenceHelper{
     private Context context;
     private PendingIntent geofencePendingIntent;

@@ -14,6 +14,9 @@ import de.dhbwmatinf19ai1.cclarityis.R;
 
 import static de.dhbwmatinf19ai1.cclarityis.Geofences.Constants.CHANNEL_ID;
 
+/**
+ * @author Tobias Schweikart
+ */
 public class MyBroadCastReceiver extends BroadcastReceiver {
     private static final String TAG = "GeoFenceBroadcast";
 
@@ -26,7 +29,7 @@ public class MyBroadCastReceiver extends BroadcastReceiver {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         String test = geofencingEvent.getTriggeringGeofences().toString();
         GeofenceTransitionsJobIntentService.enqueueWork(context, intent);
-        Log.d(TAG, "Location change Recieved2"+test);
+        Log.d(TAG, "Aktivierter Geofence"+test);
 
         //sendNotification("Test", context);
     }

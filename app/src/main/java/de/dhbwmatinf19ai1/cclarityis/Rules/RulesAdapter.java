@@ -11,6 +11,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * @author Leon Nehring
+ */
+
 public class RulesAdapter extends BaseExpandableListAdapter {
 
     ArrayList<String> elements_title;

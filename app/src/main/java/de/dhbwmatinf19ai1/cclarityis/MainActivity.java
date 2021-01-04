@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         if (receivedIntent != null && receivedIntent.hasExtra(Intent.EXTRA_TEXT)) {
             String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
             // Die empfangenen Daten können nun verwendet werden ...
-            maketoast("Funzt");
             factFragment.setLocationGeofence();
         }else{
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -118,13 +117,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            maketoast(location.toString());
-                            // createGeofence(location.getLongitude(), location.getLatitude(), 1000); //GeofenceCreateAufruf
+//                            maketoast(location.toString());
                             GeofenceHelper Helper = new GeofenceHelper(context);
                             GeofencingClient geofencingClient = LocationServices.getGeofencingClient(context);
                             Helper.addGeofence(context,location.getLatitude(),location.getLongitude(),geofencingClient);
                         }else {
-                            maketoast("getLocation: Keine Location empfangen");
+                            Log.d("getLastLocation", "Keine Location empfangen");
                         }
                     }
                 });

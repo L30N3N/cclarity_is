@@ -9,6 +9,7 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import de.dhbwmatinf19ai1.cclarityis.R;
 
 /**
+ * @author Tobias Schweikart
  * Geofence error codes mapped to error messages.
  */
 class GeofenceErrorMessages {

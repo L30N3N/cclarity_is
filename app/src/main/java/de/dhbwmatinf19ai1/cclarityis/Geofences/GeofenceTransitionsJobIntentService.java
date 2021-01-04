@@ -33,6 +33,7 @@ import de.dhbwmatinf19ai1.cclarityis.MainActivity;
 import de.dhbwmatinf19ai1.cclarityis.R;
 
 /**
+ * @author Tobias Schweikart
  * Listener for geofence transition changes.
  *
  * Receives geofence transition events from Location Services in the form of an Intent containing
@@ -99,7 +100,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService implem
                     geoClient);
 
 
-            sendNotification("Dein Standort hat sich gändert.");
+            sendNotification("Dein Standort hat sich geändert.");
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
