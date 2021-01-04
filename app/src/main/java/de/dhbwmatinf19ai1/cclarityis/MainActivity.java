@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -64,6 +68,33 @@ public class MainActivity extends AppCompatActivity {
         }else{
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             setupGeofence();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.info:
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Info");
+                builder.setIcon(R.drawable.ic_baseline_info_24);
+                builder.setMessage("Verwendete Quellen: \n - RKI API (https://services7.arcgis.com/) \n - Openstreetmap  \n - Tourismus-Wegweiser (https://tourismus-wegweiser.de/json/) \n\n Alle Angaben ohne Gewähr \n\n\n Entwickler: \n Tobias Schweikart \n Leon Nehring \n Yannick Schroth");
+                builder.show();
+                return true;
+
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
