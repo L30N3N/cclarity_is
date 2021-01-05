@@ -74,8 +74,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
                 input = editText.getText().toString();
                 if (input.matches("")){ //Wird aufgerufen, wenn nichts eingegeben wurde
                     textView.setVisibility(View.VISIBLE);
-                    textView2.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
+                    hideData();
                     textView.setText("Bitte Ort eingeben!");
                     Log.d("Start", "Nichts in Textfeld eingegeben");
                 }else { //Knopfdruch bei Eingabe führt folgende Methoden aus
@@ -170,6 +169,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
         String last_update = output.getStand();
 
         if (landkreis == null) { //Wenn kein Landkreis ermittelt werden konnte
+            loader.setVisibility(View.GONE);
             textView2.setVisibility(View.GONE);
             imageView.setVisibility(View.GONE);
             textView.setText("Es konnten keine Daten ermittelt werden");
