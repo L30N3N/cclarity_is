@@ -14,3 +14,4 @@ Getestete Android Version(en):  OxygenOS  9.0.6 (Android 9, real Device)
                                 
 Arbeitseinteilung: steht in den Java-Dateien (GitHub Pushes sind evtl. wenig aussagekräftig) 
                                 
+GeoFences sind auf 1km eingestellt!
