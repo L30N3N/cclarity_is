@@ -95,8 +95,7 @@ public class FactFragment extends Fragment implements CoronaResponseAsync, Locat
             public void onClick(View v) { //Onclick für die automatische Standortermittlung
                 if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED){ //Überprüfung der Standorterlaubnis
                     textView.setVisibility(View.VISIBLE);
-                    textView2.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
+                    hideData();
                     textView.setText("Automatische Standortermittlung nicht möglich, bestätigen Sie zuvor die entsprechende Erlaubnis");
                     Log.d("Start", "Methoden wurde aufgrund fehlender Berechtigungen nicht ausgeführt");
                 }else {
